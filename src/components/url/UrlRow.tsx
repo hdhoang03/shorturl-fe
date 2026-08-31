@@ -2,7 +2,8 @@ import { useState } from 'react';
 import type { ShortUrlResponse } from '../../types';
 import { Badge } from '../common/Badge';
 import { CopyButton } from '../common/CopyButton';
-import { truncateUrl, formatCount, isExpired } from '../../utils/format';
+import { FaviconImg } from '../common/FaviconImg';
+import { truncateUrl, formatCount, isExpired, isExpiringSoon, getDomain } from '../../utils/format';
 
 // ─── UrlRow Component ─────────────────────────────────────────────────────────
 
@@ -18,9 +19,22 @@ export function UrlRow({ url, onEdit, onDelete, onAnalytics }: UrlRowProps) {
   const [showQr, setShowQr] = useState(false);
 
   const expired = isExpired(url.expiresAt);
+  const expiringSoon = !expired && isExpiringSoon(url.expiresAt);
   const isActive = url.active ?? url.isActive;
-  const badgeVariant = !isActive ? 'inactive' : expired ? 'expired' : 'active';
+
+  let badgeVariant: 'active' | 'expired' | 'inactive' | 'warning' | 'neutral';
+  if (!isActive) {
+    badgeVariant = 'inactive';
+  } else if (expired) {
+    badgeVariant = 'expired';
+  } else if (expiringSoon) {
+    badgeVariant = 'warning';
+  } else {
+    badgeVariant = 'active';
+  }
+
   const clicks = url.totalClicks ?? url.clickCount ?? 0;
+  const domain = getDomain(url.originalUrl);
 
   const handleDelete = () => {
     if (!confirmDelete) {
@@ -36,15 +50,18 @@ export function UrlRow({ url, onEdit, onDelete, onAnalytics }: UrlRowProps) {
       <tr className="border-b border-border hover:bg-muted-light/60 transition-colors">
         {/* Original URL */}
         <td className="px-5 py-3">
-          <a
-            href={url.originalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-accent hover:text-accent-blue transition-colors no-underline font-normal"
-            title={url.originalUrl}
-          >
-            {truncateUrl(url.originalUrl, 55)}
-          </a>
+          <div className="flex items-center gap-2">
+            <FaviconImg domain={domain} className="opacity-70" />
+            <a
+              href={url.originalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent hover:text-accent-blue transition-colors no-underline font-normal"
+              title={url.originalUrl}
+            >
+              {truncateUrl(url.originalUrl, 52)}
+            </a>
+          </div>
         </td>
 
         {/* Short code */}
@@ -58,7 +75,7 @@ export function UrlRow({ url, onEdit, onDelete, onAnalytics }: UrlRowProps) {
         </td>
 
         {/* Clicks */}
-        <td className="px-4 py-3 text-sm text-muted">
+        <td className="px-4 py-3 text-sm text-muted tabular-nums">
           {formatCount(clicks)}
         </td>
 
@@ -74,6 +91,7 @@ export function UrlRow({ url, onEdit, onDelete, onAnalytics }: UrlRowProps) {
               onClick={onAnalytics}
               className="px-2.5 py-1 text-xs font-medium text-muted border border-border rounded
                          hover:text-accent hover:border-accent transition-colors"
+              title="View analytics"
             >
               Stats
             </button>
@@ -86,6 +104,7 @@ export function UrlRow({ url, onEdit, onDelete, onAnalytics }: UrlRowProps) {
                     ? 'border-accent-blue text-accent-blue bg-blue-50'
                     : 'text-muted border-border hover:text-accent hover:border-accent',
                 ].join(' ')}
+                title="Show QR code"
               >
                 QR
               </button>
@@ -94,6 +113,7 @@ export function UrlRow({ url, onEdit, onDelete, onAnalytics }: UrlRowProps) {
               onClick={onEdit}
               className="px-2.5 py-1 text-xs font-medium text-muted border border-border rounded
                          hover:text-accent hover:border-accent transition-colors"
+              title="Edit link"
             >
               Edit
             </button>
@@ -105,9 +125,9 @@ export function UrlRow({ url, onEdit, onDelete, onAnalytics }: UrlRowProps) {
                   ? 'text-white bg-danger border-danger'
                   : 'text-muted border-border hover:text-danger hover:border-danger',
               ].join(' ')}
-              title={confirmDelete ? 'Click again to confirm' : 'Delete'}
+              title={confirmDelete ? 'Click again to confirm deletion' : 'Delete link'}
             >
-              {confirmDelete ? 'Confirm' : 'Delete'}
+              {confirmDelete ? 'Confirm?' : 'Delete'}
             </button>
           </div>
         </td>
@@ -125,7 +145,7 @@ export function UrlRow({ url, onEdit, onDelete, onAnalytics }: UrlRowProps) {
               />
               <div>
                 <p className="text-xs font-medium text-accent mb-1">
-                  QR Code — {url.shortUrl}
+                  QR Code — <span className="font-mono">{url.shortUrl}</span>
                 </p>
                 <a
                   href={url.qrCodeBase64}
@@ -142,3 +162,4 @@ export function UrlRow({ url, onEdit, onDelete, onAnalytics }: UrlRowProps) {
     </>
   );
 }
+

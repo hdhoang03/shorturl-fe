@@ -1,173 +1,152 @@
-# Short URL Frontend — React + TailwindCSS
+# UI Enhancement — Gói 3 Toàn Bộ
 
-## Mô tả
+Nâng cấp toàn diện giao diện ShortURL theo phong cách **Developer-grade craft UI** (Vercel/Linear/Stripe), không AI-slop, duy trì clean code và cấu trúc component tách biệt.
 
-Xây dựng giao diện frontend cho hệ thống rút gọn URL (ShortURL) dựa trên backend Java Spring Boot đã có.
-Phong cách thiết kế: **Clean, editorial, tối giản** — không icon trang trí, không bo góc quá nhiều, ưu tiên typography và layout rõ ràng, tone màu trung tính (trắng/đen/xám) với 1 màu accent.
+## Tóm tắt thay đổi
 
----
-
-## API Backend (đã phân tích)
-
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `POST` | `/api/v1/urls/shorten` | Tạo short URL mới |
-| `GET` | `/api/v1/urls/{shortCode}` | Lấy chi tiết một short URL |
-| `POST` | `/api/v1/urls/batch` | Lấy nhiều short URL theo danh sách shortCode |
-| `PUT` | `/api/v1/urls/{shortCode}` | Cập nhật URL (target, expiry, active status) |
-| `DELETE` | `/api/v1/urls/{shortCode}` | Xóa short URL |
-| `GET` | `/api/v1/urls/{shortCode}/analytics` | Xem analytics: clicks, device, OS, browser, referrer |
-| `GET` | `/{shortCode}` | Redirect về URL gốc (HTTP 302) |
-
----
-
-## Cấu trúc thư mục đề xuất
-
-```
-shorturl-fe/
-├── public/
-├── src/
-│   ├── api/
-│   │   └── urlApi.ts             # Axios instances + tất cả API calls
-│   ├── components/
-│   │   ├── layout/
-│   │   │   ├── Header.tsx        # Logo + nav
-│   │   │   └── Layout.tsx        # Wrapper chính
-│   │   ├── url/
-│   │   │   ├── ShortenForm.tsx   # Form nhập URL dài + tùy chọn
-│   │   │   ├── ResultCard.tsx    # Hiển thị short URL vừa tạo + nút copy
-│   │   │   ├── UrlTable.tsx      # Bảng danh sách các URL đã tạo
-│   │   │   ├── UrlRow.tsx        # Hàng trong bảng (edit / delete / analytics)
-│   │   │   └── EditModal.tsx     # Modal cập nhật URL
-│   │   ├── analytics/
-│   │   │   ├── AnalyticsModal.tsx  # Modal xem analytics tổng quan
-│   │   │   ├── StatCard.tsx        # Card số liệu (total clicks, unique...)
-│   │   │   └── BarChart.tsx        # Biểu đồ thanh (device, browser, OS)
-│   │   └── common/
-│   │       ├── Button.tsx
-│   │       ├── Input.tsx
-│   │       ├── Modal.tsx
-│   │       ├── Badge.tsx         # Active / Expired badge
-│   │       └── CopyButton.tsx
-│   ├── hooks/
-│   │   ├── useUrls.ts            # Quản lý danh sách URL từ localStorage
-│   │   └── useAnalytics.ts      # Fetch analytics data
-│   ├── pages/
-│   │   ├── HomePage.tsx          # Trang chính: form + bảng history
-│   │   └── AnalyticsPage.tsx     # Trang analytics chi tiết (optional)
-│   ├── types/
-│   │   └── index.ts              # TypeScript interfaces
-│   ├── utils/
-│   │   └── format.ts             # Format date, truncate URL...
-│   ├── App.tsx
-│   ├── main.tsx
-│   └── index.css
-├── tailwind.config.js
-├── vite.config.ts
-└── package.json
-```
-
----
-
-## Thiết kế UI
-
-### Trang chính (HomePage)
-
-```
-┌────────────────────────────────────────────────────────────┐
-│  SHORTURL                                    History  Docs  │  ← Header (border-bottom)
-├────────────────────────────────────────────────────────────┤
-│                                                            │
-│  Shorten your URL                                          │  ← Hero section
-│  ──────────────────────────────────────────────────────   │
-│  [ https://very-long-url.com/path?query=...         ]      │  ← Input
-│  [ Custom alias (optional) ]  [ Expires in: 7 days ]       │
-│                                        [ Shorten ]         │
-│                                                            │
-│  ── Result ─────────────────────────────────────────────   │
-│  short.ly/abc123       [Copy]  [Open]                      │  ← ResultCard
-│                                                            │
-├────────────────────────────────────────────────────────────┤
-│  Your links                                 [Refresh]      │  ← Table section
-│  ─────────────────────────────────────────────────────     │
-│  Original URL          Short code   Clicks  Status  Action │
-│  ─────────────────────────────────────────────────────     │
-│  https://example...    abc123       42      Active   ...    │
-│  https://google...     xyz789       8       Expired  ...    │
-└────────────────────────────────────────────────────────────┘
-```
-
-### Analytics Modal
-
-```
-┌──────────────────────────────────────────────────────┐
-│  Analytics — abc123                            [✕]   │
-│  ────────────────────────────────────────────────    │
-│  Total Clicks: 42    Unique: 31    Last Click: ...   │
-│  ────────────────────────────────────────────────    │
-│  Device          Browser        OS                   │
-│  ██ Mobile 60%   ██ Chrome 70%  ██ Android 55%       │
-│  ██ Desktop 40%  ██ Safari 30%  ██ Windows 45%       │
-│  ────────────────────────────────────────────────    │
-│  Top Referrers                                       │
-│  google.com   15   facebook.com  8   direct  19     │
-└──────────────────────────────────────────────────────┘
-```
-
----
-
-## Design Tokens
-
-| Token | Value | Ghi chú |
-|-------|-------|---------|
-| `--color-accent` | `#1a1a1a` | Màu chính (đen editorial) |
-| `--color-accent-blue` | `#2563eb` | Màu CTA button |
-| `--color-surface` | `#ffffff` | Background |
-| `--color-border` | `#e5e7eb` | Đường kẻ nhạt |
-| `--color-muted` | `#6b7280` | Text phụ |
-| `border-radius` | `4px` | Tối thiểu, không bo tròn nhiều |
-| `font-family` | `Inter` | Google Fonts |
-
----
-
-## Proposed Changes
-
-### [NEW] Project scaffold với Vite + React + TailwindCSS
-- Khởi tạo bằng `npx create-vite@latest shorturl-fe -- --template react-ts`
-- Cài TailwindCSS v3
-- Cấu hình `tailwind.config.js` với color tokens
-
-### [NEW] `src/types/index.ts`
-- Interface `ShortUrlResponse`, `ClickAnalyticsResponse`, `ShortenUrlRequest`, `UpdateUrlRequest`
-
-### [NEW] `src/api/urlApi.ts`
-- Axios base instance pointing tới `http://localhost:8080`
-- Các hàm: `shortenUrl`, `getUrlDetails`, `getBatchUrls`, `updateUrl`, `deleteUrl`, `getAnalytics`
-
-### [NEW] `src/hooks/useUrls.ts`
-- Lưu danh sách `shortCodes` vào `localStorage`
-- Gọi batch API để fetch thông tin khi load
-
-### [NEW] Components (theo cấu trúc trên)
-
----
+| Khu vực | Thay đổi chính |
+|---|---|
+| Design System | Màu sắc mới, font Monospace `JetBrains Mono`, shadow đa tầng |
+| Header | Thêm dark mode toggle, logo tinh tế hơn |
+| ShortenForm | Nút Ctrl+V paste nhanh, Enter↵ badge trên Submit |
+| CopyButton | Micro-spring animation, ripple effect khi copy |
+| Badge | Pastel pill mới với chấm nhấp nháy (Active), Expiring Soon |
+| UrlRow | Favicon tự fetch theo domain, QR Popover tinh gọn hơn |
+| UrlTable | Live search + Filter tabs (All/Active/Expired) + 3 metric cards |
+| ResultCard | QR panel nâng cấp, Monospace link style |
+| DashboardMetrics | Component mới — 3 thẻ thống kê tổng quan |
+| QrPopover | Component mới — popover QR code hover/click trong UrlRow |
+| FaviconImg | Component mới — tự fetch favicon domain |
 
 ## Open Questions
 
 > [!IMPORTANT]
-> **Base URL API**: Backend chạy ở `http://localhost:8080` — có cần thay đổi không?
-
-> [!IMPORTANT]
-> **Routing**: Có cần nhiều page riêng (React Router) hay chỉ cần 1 trang duy nhất (single page) với modal?
+> Favicon API: Sẽ dùng `https://www.google.com/s2/favicons?domain={domain}&sz=32` (free, không cần auth, hoạt động tốt cho developer tool). Bạn có muốn dùng nguồn khác không?
 
 > [!NOTE]
-> **Tên miền rút gọn**: Phần ResultCard hiển thị URL dạng `localhost:8080/{shortCode}` — có domain thật không?
+> Dark Mode: Đề xuất chỉ thêm class-based dark mode (thêm class `dark` vào `<html>`) để giữ giao diện clean, không bị over-engineered. Toggle sẽ lưu vào `localStorage`.
+
+## Proposed Changes
+
+---
+
+### Design System
+
+#### [MODIFY] [tailwind.config.js](file:///c:/Users/HP/Desktop/shorturl-fe/tailwind.config.js)
+- Thêm font `JetBrains Mono` vào `fontFamily.mono`
+- Thêm màu `warning` (amber) cho badge "Expiring Soon"
+- Nâng `borderRadius` mặc định lên `6px` để card mềm mại hơn
+- Thêm `boxShadow` custom `card` với shadow đa tầng tinh tế
+
+#### [MODIFY] [index.css](file:///c:/Users/HP/Desktop/shorturl-fe/src/index.css)
+- Import `JetBrains Mono` từ Google Fonts
+- Thêm CSS animation `@keyframes ripple`, `@keyframes pulse-dot`
+- Custom scrollbar tinh tế hơn
+- Dark mode base styles
+
+---
+
+### Common Components
+
+#### [MODIFY] [CopyButton.tsx](file:///c:/Users/HP/Desktop/shorturl-fe/src/components/common/CopyButton.tsx)
+- Thêm icon SVG thay cho text thuần
+- Hiệu ứng checkmark nảy khi copied (CSS animation)
+- Ripple effect lan tỏa khi click
+
+#### [MODIFY] [Badge.tsx](file:///c:/Users/HP/Desktop/shorturl-fe/src/components/common/Badge.tsx)
+- Thêm variant `warning` (Expiring Soon — amber)
+- Active badge có chấm xanh nhấp nháy `animate-pulse`
+- Pill shape thay vì rectangle
+
+#### [MODIFY] [Button.tsx](file:///c:/Users/HP/Desktop/shorturl-fe/src/components/common/Button.tsx)
+- Nâng cấp `primary` variant với shadow nhẹ + hover lift effect
+- Thêm `icon` slot prop
+
+---
+
+### New Common Components
+
+#### [NEW] `src/components/common/FaviconImg.tsx`
+- Render favicon của domain dựa trên URL
+- Fallback sang icon "link" SVG nếu không tải được favicon
+- Chỉ render `<img>` — không logic phức tạp
+
+---
+
+### Layout
+
+#### [MODIFY] [Header.tsx](file:///c:/Users/HP/Desktop/shorturl-fe/src/components/layout/Header.tsx)
+- Thêm nút toggle Dark Mode (icon sun/moon)
+- Logo wordmark đẹp hơn với dấu `/` màu accent
+
+#### [MODIFY] [Layout.tsx](file:///c:/Users/HP/Desktop/shorturl-fe/src/components/layout/Layout.tsx)
+- Footer thêm thông tin build + version
+- Áp dụng dark mode class
+
+---
+
+### URL Components
+
+#### [MODIFY] [ShortenForm.tsx](file:///c:/Users/HP/Desktop/shorturl-fe/src/components/url/ShortenForm.tsx)
+- Nút `Ctrl+V` nhỏ bên phải input URL — click tự paste clipboard
+- Submit button hiển thị badge `⏎` khi đang nhập
+- Error message animation slide-in
+
+#### [MODIFY] [UrlRow.tsx](file:///c:/Users/HP/Desktop/shorturl-fe/src/components/url/UrlRow.tsx)
+- Thêm `FaviconImg` cạnh Original URL
+- QR button dùng SVG icon thay text "QR"
+- Badge cập nhật logic `warning` (sắp hết hạn trong 7 ngày)
+
+#### [MODIFY] [UrlTable.tsx](file:///c:/Users/HP/Desktop/shorturl-fe/src/components/url/UrlTable.tsx)
+- Thêm `DashboardMetrics` ở trên header bảng
+- Thêm thanh tìm kiếm live filter (theo URL / short code)
+- Thêm Filter Tabs: `All` | `Active` | `Expired`
+- Tách logic filter ra hook riêng `useUrlFilter.ts`
+
+#### [MODIFY] [ResultCard.tsx](file:///c:/Users/HP/Desktop/shorturl-fe/src/components/url/ResultCard.tsx)
+- Short URL dùng font `font-mono` đẹp hơn
+- QR panel có animation expand mượt
+- Badge "Just created" xanh lá nhỏ
+
+---
+
+### New Feature Components
+
+#### [NEW] `src/components/url/DashboardMetrics.tsx`
+- 3 thẻ thống kê: **Total Links** | **Total Clicks** | **Active / Expired**
+- Compact card với icon SVG + số liệu
+- Tính toán từ `urls[]` array truyền vào (không cần API mới)
+
+#### [NEW] `src/hooks/useUrlFilter.ts`
+- Custom hook quản lý state `search` + `filter` (all/active/expired)
+- Export `filteredUrls`, `search`, `setSearch`, `filter`, `setFilter`
+- Pure logic — không liên quan UI
+
+---
+
+### Utils
+
+#### [MODIFY] [format.ts](file:///c:/Users/HP/Desktop/shorturl-fe/src/utils/format.ts)
+- Thêm hàm `getDomain(url)` — trích xuất hostname để fetch favicon
+- Thêm hàm `isExpiringSoon(expiresAt, days = 7)` — badge warning
 
 ---
 
 ## Verification Plan
 
-- Chạy `npm run dev`, mở browser kiểm tra giao diện
-- Test form shorten → copy link
-- Test bảng history load từ localStorage
-- Test analytics modal
+### Automated Build Check
+```bash
+npm run build
+```
+
+### Browser Preview
+- Dùng browser subagent chụp screenshot giao diện sau khi hoàn thành
+- Kiểm tra: Copy button animation, Live search, Dark mode, Favicon icons
+
+### Manual Checklist
+- [ ] Không có lỗi TypeScript
+- [ ] Live filter hoạt động đúng
+- [ ] Badge "Expiring Soon" xuất hiện đúng
+- [ ] Favicon load đúng / fallback graceful
+- [ ] Dark mode toggle save localStorage
+- [ ] QR popover mở/đóng mượt

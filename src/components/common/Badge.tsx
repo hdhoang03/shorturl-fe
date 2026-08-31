@@ -1,6 +1,6 @@
 // ─── Badge Component ──────────────────────────────────────────────────────────
 
-type BadgeVariant = 'active' | 'expired' | 'inactive' | 'neutral';
+type BadgeVariant = 'active' | 'expired' | 'inactive' | 'neutral' | 'warning';
 
 interface BadgeProps {
   variant: BadgeVariant;
@@ -12,13 +12,15 @@ const styles: Record<BadgeVariant, string> = {
   expired: 'bg-red-50 text-danger border border-red-200',
   inactive: 'bg-gray-100 text-muted border border-border',
   neutral: 'bg-muted-light text-muted border border-border',
+  warning: 'bg-amber-50 text-warning border border-amber-200',
 };
 
 const labels: Record<BadgeVariant, string> = {
-  active: 'Active',
+  active: '· Active',
   expired: 'Expired',
   inactive: 'Inactive',
   neutral: 'Unknown',
+  warning: 'Expiring',
 };
 
 export function Badge({ variant, label }: BadgeProps) {
@@ -33,3 +35,4 @@ export function Badge({ variant, label }: BadgeProps) {
     </span>
   );
 }
+

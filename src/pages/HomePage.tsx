@@ -57,13 +57,13 @@ export function HomePage() {
 
       {/* Result card appears after shortening */}
       {result && (
-        <div className="mt-4">
+        <div className="mt-5 sm:mt-6">
           <ResultCard result={result} />
         </div>
       )}
 
       {/* Link history table */}
-      <div className="mt-8">
+      <div className="mt-8 sm:mt-10">
         <UrlTable
           urls={urls}
           loading={loading}

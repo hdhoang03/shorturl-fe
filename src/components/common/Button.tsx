@@ -13,9 +13,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    'bg-accent-blue text-white hover:bg-accent-blue-hover border border-transparent disabled:opacity-50',
+    'bg-accent-blue text-white hover:bg-accent-blue-hover border border-transparent shadow-sm hover:-translate-y-px active:translate-y-0 disabled:opacity-50 disabled:shadow-none disabled:hover:translate-y-0',
   secondary:
-    'bg-white text-accent border border-border hover:bg-muted-light disabled:opacity-50',
+    'bg-white text-accent border border-border hover:bg-muted-light shadow-card disabled:opacity-50',
   ghost:
     'bg-transparent text-muted hover:text-accent hover:bg-muted-light border border-transparent disabled:opacity-40',
   danger:
@@ -41,7 +41,7 @@ export function Button({
     <button
       disabled={disabled || loading}
       className={[
-        'inline-flex items-center justify-center gap-2 font-medium rounded transition-colors duration-150 cursor-pointer select-none whitespace-nowrap',
+        'inline-flex items-center justify-center gap-2 font-medium rounded transition-all duration-150 cursor-pointer select-none whitespace-nowrap',
         variantClasses[variant],
         sizeClasses[size],
         className,
@@ -55,3 +55,4 @@ export function Button({
     </button>
   );
 }
+

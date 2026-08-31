@@ -55,6 +55,30 @@ export function isExpired(expiresAt: string | null): boolean {
   return new Date(expiresAt).getTime() < Date.now();
 }
 
+/**
+ * Extract hostname from a URL for favicon lookup
+ * "https://github.com/user/repo" → "github.com"
+ */
+export function getDomain(url: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Returns true if a link expires within `days` days (and is not yet expired)
+ */
+export function isExpiringSoon(expiresAt: string | null, days = 7): boolean {
+  if (!expiresAt) return false;
+  const expiry = new Date(expiresAt).getTime();
+  const now = Date.now();
+  if (expiry <= now) return false; // already expired
+  const threshold = days * 24 * 60 * 60 * 1000;
+  return expiry - now <= threshold;
+}
+
 // ─── Number Formatters ────────────────────────────────────────────────────────
 
 /**
@@ -65,3 +89,4 @@ export function formatCount(n: number): string {
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return String(n);
 }
+

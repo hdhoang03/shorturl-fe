@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -18,8 +20,25 @@
     margin: 0;
   }
 
+  /* Dark mode overrides */
+  html.dark body {
+    background-color: #111111;
+    color: #e5e7eb;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
   h1, h2, h3, h4 {
     @apply font-semibold text-accent;
+  }
+
+  html.dark h1,
+  html.dark h2,
+  html.dark h3,
+  html.dark h4 {
+    color: #f3f4f6;
   }
 
   a {
@@ -39,7 +58,16 @@
     @apply bg-border;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-muted rounded;
+    background-color: #d1d5db;
+    border-radius: 3px;
+  }
+
+  html.dark ::-webkit-scrollbar-track {
+    background-color: #1f2937;
+  }
+
+  html.dark ::-webkit-scrollbar-thumb {
+    background-color: #374151;
   }
 }
 
@@ -59,4 +87,48 @@
     max-width: 280px;
     @apply truncate;
   }
+
+  /* Dark mode card */
+  html.dark .bg-white {
+    background-color: #1c1c1e;
+  }
+
+  html.dark .bg-muted-light {
+    background-color: #111111;
+  }
+
+  html.dark .border-border {
+    border-color: #2d2d2d;
+  }
+
+  html.dark .text-muted {
+    color: #9ca3af;
+  }
+
+  html.dark .text-accent {
+    color: #f3f4f6;
+  }
+
+  html.dark .hover\:bg-muted-light\/60:hover {
+    background-color: rgba(31, 31, 31, 0.6);
+  }
 }
+
+@layer utilities {
+  /* Error / notice slide-in */
+  @keyframes slide-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-in {
+    animation: slide-in 0.15s ease-out both;
+  }
+}
+

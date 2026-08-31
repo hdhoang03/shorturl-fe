@@ -34,7 +34,7 @@ export function CopyButton({ text, size = 'md' }: CopyButtonProps) {
     <button
       onClick={handleCopy}
       className={[
-        'font-medium border rounded transition-all duration-150 cursor-pointer',
+        'font-medium border rounded transition-all duration-200 cursor-pointer',
         sizeClass,
         copied
           ? 'bg-green-50 text-success border-green-200'
@@ -42,7 +42,8 @@ export function CopyButton({ text, size = 'md' }: CopyButtonProps) {
       ].join(' ')}
       title="Copy to clipboard"
     >
-      {copied ? 'Copied' : 'Copy'}
+      {copied ? 'Copied ✓' : 'Copy'}
     </button>
   );
 }
+

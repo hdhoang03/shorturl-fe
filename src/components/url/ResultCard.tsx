@@ -13,7 +13,7 @@ export function ResultCard({ result }: ResultCardProps) {
   const [showQr, setShowQr] = useState(false);
 
   return (
-    <div className="bg-white border border-accent-blue/20 rounded-lg px-5 py-4">
+    <div className="bg-white border border-border border-l-2 border-l-accent-blue rounded-lg px-5 py-4 shadow-card animate-slide-in">
       <p className="text-xs text-muted mb-2 font-medium uppercase tracking-wide">
         Your link is ready
       </p>
@@ -26,7 +26,7 @@ export function ResultCard({ result }: ResultCardProps) {
               href={result.shortUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-base font-semibold text-accent-blue break-all"
+              className="text-base font-semibold font-mono text-accent-blue break-all"
             >
               {result.shortUrl}
             </a>
@@ -40,7 +40,7 @@ export function ResultCard({ result }: ResultCardProps) {
                 className="px-3 py-1.5 text-xs font-medium border border-border rounded text-muted
                            hover:text-accent hover:border-accent transition-colors no-underline"
               >
-                Open
+                Open ↗
               </a>
               {result.qrCodeBase64 && (
                 <button
@@ -64,30 +64,36 @@ export function ResultCard({ result }: ResultCardProps) {
         </div>
       </div>
 
-      {/* QR Code panel */}
-      {showQr && result.qrCodeBase64 && (
-        <div className="mt-4 pt-4 border-t border-border flex items-start gap-4">
-          <img
-            src={result.qrCodeBase64}
-            alt={`QR code for ${result.shortUrl}`}
-            className="w-36 h-36 border border-border rounded"
-          />
-          <div className="flex flex-col gap-2">
-            <p className="text-xs font-medium text-accent">QR Code</p>
-            <p className="text-xs text-muted">
-              Scan to open <strong>{result.shortUrl}</strong>
-            </p>
-            <a
-              href={result.qrCodeBase64}
-              download={`qr-${result.shortCode}.png`}
-              className="px-3 py-1.5 text-xs font-medium border border-border rounded text-muted
-                         hover:text-accent hover:border-accent transition-colors no-underline inline-block w-fit"
-            >
-              Download PNG
-            </a>
+      {/* QR Code panel — CSS height transition */}
+      <div
+        className="overflow-hidden transition-all duration-200"
+        style={{ maxHeight: showQr && result.qrCodeBase64 ? '200px' : '0px' }}
+      >
+        {result.qrCodeBase64 && (
+          <div className="mt-4 pt-4 border-t border-border flex items-start gap-4">
+            <img
+              src={result.qrCodeBase64}
+              alt={`QR code for ${result.shortUrl}`}
+              className="w-32 h-32 border border-border rounded"
+            />
+            <div className="flex flex-col gap-2">
+              <p className="text-xs font-medium text-accent">QR Code</p>
+              <p className="text-xs text-muted">
+                Scan to open <span className="font-mono text-accent">{result.shortUrl}</span>
+              </p>
+              <a
+                href={result.qrCodeBase64}
+                download={`qr-${result.shortCode}.png`}
+                className="px-3 py-1.5 text-xs font-medium border border-border rounded text-muted
+                           hover:text-accent hover:border-accent transition-colors no-underline inline-block w-fit"
+              >
+                Download PNG
+              </a>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
+
